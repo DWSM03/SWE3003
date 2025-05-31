@@ -1,0 +1,4 @@
+admin,admin123,True
+john,pass123,False
+sarah,hello2025,False
+Dulan,qwe123,False

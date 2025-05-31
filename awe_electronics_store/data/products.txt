@@ -1,0 +1,8 @@
+P001,Apple iPhone 14,1399.0,8,SKU_IP14,2025-05-31 23:44:56,iphone14.png,Phone
+P002,Samsung Galaxy S22,1299.0,4,SKU_SGS22,2025-05-31 23:44:56,galaxys22.png,Phone
+P003,Dell Inspiron Laptop,899.99,5,SKU_DELLINSP,2025-05-31 23:44:56,dell_inspiron.png,Laptop
+P004,Sony WH-1000XM4 Headphones,349.5,15,SKU_SONYXM4,2025-05-31 23:44:56,sony_xm4.png,Accessories
+P005,Logitech MX Master 3 Mouse,149.99,20,SKU_LOGIMX3,2025-05-31 23:44:56,logi_mx3.png,Accessories
+P007,Lenovo ThinkPad,1299.99,0,SKU_LENTP2025,2025-05-31 23:50:07,thinkpad.png,Laptop
+P008,Dell XPS 13,1399.99,20,SKU_XPS13,2025-06-01 02:24:18,dell_xps13.png,Laptop
+P009,MacBook Air,1499.99,20,SKU_MBA2025,2025-06-01 02:41:51,macbook_air.png,Laptop
