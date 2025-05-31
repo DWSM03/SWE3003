@@ -1,6 +1,0 @@
-P001,Apple iPhone 14,1399.0,10
-P002,Samsung Galaxy S22,1299.0,7
-P003,Dell Inspiron Laptop,899.99,5
-P004,Sony WH-1000XM4 Headphones,349.5,15
-P005,Logitech MX Master 3 Mouse,149.99,20
-P001,DS12,300.0,150
