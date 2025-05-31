@@ -1,8 +1,0 @@
-john|P001:1,P005:2
-sarah|P003:1
-dulan|P004:2
-john|P002:1
-john|P002:5
-john|P003:2
-john|P001:3
-john|P002:2
