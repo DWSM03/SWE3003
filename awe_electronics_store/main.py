@@ -4,6 +4,7 @@ from models.order import Order, CartItem
 from models.invoice import generate_invoice
 from models.shipment import Shipment
 from models.shopping_cart import ShoppingCart
+from models.payment_strategy import CreditCardPayment, PayPalPayment, CashPayment
 
 
 # ----------------------------
@@ -58,18 +59,26 @@ def generate_sales_report(orders, products):
             price = product_price_map.get(item.product_id, 0)
             total_revenue += price * item.quantity
 
+    total_orders = len(orders)
+    average_order_value = total_revenue / total_orders if total_orders > 0 else 0
+
     print("\n📊 Sales Report")
     print("----------------------")
-    print(f"Total Orders: {len(orders)}")
+    print(f"Total Orders: {total_orders}")
     print(f"Total Revenue: ${total_revenue:.2f}")
+    print(f"Average Order Value: ${average_order_value:.2f}")
 
     if product_sales:
-        top_product_id = max(product_sales, key=product_sales.get)
-        top_qty = product_sales[top_product_id]
-        top_name = next((p.name for p in products if p.product_id == top_product_id), "Unknown")
-        print(f"Top Product: {top_name} (ID: {top_product_id}) - {top_qty} sold")
+        # Get top 3 products sorted by quantity sold
+        sorted_sales = sorted(product_sales.items(), key=lambda x: x[1], reverse=True)[:3]
+
+        print("\nTop 3 Products:")
+        for idx, (product_id, qty) in enumerate(sorted_sales, 1):
+            product_name = next((p.name for p in products if p.product_id == product_id), "Unknown")
+            print(f"{idx}. {product_name} (ID: {product_id}) - {qty} sold")
     else:
         print("No sales yet.")
+
 
 
 def load_shipments():
@@ -188,6 +197,27 @@ def admin_menu(products, shipments):
         elif choice == "5":
             break    
 
+def select_payment_method():
+    print("Select payment method:")
+    print("1. Credit Card")
+    print("2. PayPal")
+    print("3. Cash")
+    choice = input("Choose: ")
+
+    if choice == "1":
+        card_number = input("Card Number: ")
+        card_holder = input("Card Holder Name: ")
+        expiry = input("Expiry Date (MM/YY): ")
+        cvv = input("CVV: ")
+        return CreditCardPayment(card_number, card_holder, expiry, cvv)
+    elif choice == "2":
+        email = input("PayPal Email: ")
+        return PayPalPayment(email)
+    elif choice == "3":
+        return CashPayment()
+    else:
+        print("Invalid payment method.")
+        return None
 
 
 def validate_cart(cart, products):
@@ -204,6 +234,15 @@ def validate_cart(cart, products):
 
 def customer_menu(user, products, orders, shipments):
     cart = ShoppingCart()
+    
+    def view_my_shipments(username, shipments):
+        print("\n📦 Your Shipments:")
+        user_shipments = [s for s in shipments if s.username == username]
+        if not user_shipments:
+            print("No shipments found.")
+        else:
+            for s in user_shipments:
+                print(s)
 
     while True:
         print("\n-- Customer Menu --")
@@ -213,7 +252,8 @@ def customer_menu(user, products, orders, shipments):
         print("4. Filter by Category")
         print("5. Add to Cart")
         print("6. Checkout")
-        print("7. Logout")
+        print("7. View My Shipments")  
+        print("8. Logout")
         choice = input("Choose: ")
 
         if choice == "1":
@@ -276,7 +316,17 @@ def customer_menu(user, products, orders, shipments):
 
                 print("❌ Order failed due to stock issues.")
             else:
-                order = Order(user.username, cart.to_list())
+                # Calculate total price
+                total_amount = sum(
+                item.quantity * next((p.price for p in products if p.product_id == item.product_id), 0)
+                for item in cart
+                )
+
+                print(f"\nYour total amount is: ${total_amount:.2f}")
+
+                payment_method = select_payment_method()
+                if payment_method and payment_method.pay(total_amount):
+                    order = Order(user.username, cart.to_list())
 
                 print("\nOrder Summary:")
                 print(order.to_invoice())
@@ -304,9 +354,15 @@ def customer_menu(user, products, orders, shipments):
                     f.write(order.to_line() + '\n')
 
                 cart.clear()
-                print("✅ Order placed successfully. Shipment Status: Processing")
+                print(f"✅ Order placed successfully! 📦 Shipment created at {shipment.created_at}, status: {shipment.status}")
 
+         
         elif choice == "7":
+            view_my_shipments(user.username, shipments)
+
+
+
+        elif choice == "8":
             break
 
 # ----------------------------
